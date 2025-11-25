@@ -1,0 +1,87 @@
+.wysiwyg-editor {
+  border: 2px solid #666;
+  border-radius: 4px;
+  background: white;
+  margin: 10px 0;
+}
+
+.editor-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+  flex-wrap: wrap;
+}
+
+.editor-toolbar button {
+  padding: 6px 10px;
+  border: 1px solid #999;
+  background: white;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.editor-toolbar button:hover {
+  background: #e0e0e0;
+}
+
+.editor-toolbar button.is-active {
+  background: #0066cc;
+  color: white;
+  border-color: #0055aa;
+}
+
+.toolbar-divider {
+  width: 1px;
+  background: #ccc;
+  margin: 0 4px;
+}
+
+.color-picker {
+  width: 40px;
+  height: 32px;
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.editor-content {
+  padding: 15px;
+  min-height: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.editor-content .ProseMirror {
+  outline: none;
+  min-height: 280px;
+}
+
+.editor-content .ProseMirror p {
+  margin: 0.5em 0;
+}
+
+.editor-content .ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.5em 0;
+}
+
+.editor-content .ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.5em 0;
+}
+
+.editor-content .ProseMirror ul,
+.editor-content .ProseMirror ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.editor-content .ProseMirror li {
+  margin: 0.25em 0;
+}
