@@ -3,7 +3,6 @@ import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import { TextStyle } from '@tiptap/extension-text-style'
 import { Color } from '@tiptap/extension-color'
-import Image from '@tiptap/extension-image'
 import './WYSIWYGEditor.css'
 
 interface WYSIWYGEditorProps {
@@ -18,23 +17,12 @@ export default function WYSIWYGEditor({ content, onChange }: WYSIWYGEditorProps)
       Underline,
       TextStyle,
       Color,
-      Image.configure({
-        inline: true,
-        allowBase64: true,
-      }),
     ],
     content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
     },
   })
-
-  const addImageFromUrl = () => {
-    const url = prompt('Enter image URL:')
-    if (url && editor) {
-      editor.chain().focus().setImage({ src: url }).run()
-    }
-  }
 
   if (!editor) {
     return null
@@ -113,13 +101,6 @@ export default function WYSIWYGEditor({ content, onChange }: WYSIWYGEditorProps)
           title="Clear Color"
         >
           Clear Color
-        </button>
-        <div className="toolbar-divider"></div>
-        <button
-          onClick={addImageFromUrl}
-          title="Add Image from URL"
-        >
-          🖼️ Image URL
         </button>
       </div>
       <EditorContent editor={editor} className="editor-content" />
