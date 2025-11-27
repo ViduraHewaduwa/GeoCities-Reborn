@@ -1,17 +1,11 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import path from 'path'
-import { fileURLToPath } from 'url'
 import { generatePage } from './generator.js'
 import { publishSite, getSite } from './storage.js'
 import { registerUser, loginUser, getUserById, authMiddleware } from './auth.js'
 import { connectDB } from './db.js'
 import { generateCodeWithAI, improveCode, explainCode, fixCodeErrors, generateRetroWebsite } from './gemini.js'
-import uploadRouter from './routes/upload.js'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -19,14 +13,8 @@ const PORT = process.env.PORT || 3001
 app.use(cors())
 app.use(express.json())
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
-
 // Connect to MongoDB
 await connectDB()
-
-// Upload endpoint
-app.use('/api/upload', uploadRouter)
 
 // Auth endpoints
 app.post('/api/auth/register', async (req, res) => {

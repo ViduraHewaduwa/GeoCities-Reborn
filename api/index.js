@@ -5,7 +5,6 @@ import { connectDB } from '../backend/src/db.js';
 import authRoutes from '../backend/src/routes/auth.js';
 import aiRoutes from '../backend/src/routes/ai.js';
 import publishRoutes from '../backend/src/routes/publish.js';
-import uploadRoutes from '../backend/src/routes/upload.js';
 
 const app = express();
 
@@ -30,7 +29,6 @@ app.use(async (req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api', publishRoutes);
-app.use('/api', uploadRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
