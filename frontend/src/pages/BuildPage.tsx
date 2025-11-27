@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import CodeEditor from '../components/CodeEditor'
 import ProfileMenu from '../components/ProfileMenu'
+import AIAssistant from '../components/AIAssistant'
 import { InputModal, ConfirmModal, AlertModal, FileActionsModal } from '../components/Modal'
 import './BuildPage.css'
 
@@ -795,6 +796,15 @@ console.log('Script loaded!');
           handleDuplicateFile()
         }}
       />
+
+      {/* AI Assistant */}
+      {!showTemplates && getCurrentFile() && (
+        <AIAssistant
+          currentCode={getCurrentFile()?.content || ''}
+          currentLanguage={getLanguage(getCurrentFile()?.name || '')}
+          onCodeUpdate={updateFileContent}
+        />
+      )}
     </div>
   )
 }

@@ -662,3 +662,34 @@ body {
     gap: 20px;
   }
 }
+
+/* AI Card Specific Styling */
+.ai-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #ffff00;
+  box-shadow: 
+    5px 5px 0px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(102, 126, 234, 0.6);
+}
+
+.ai-card h2,
+.ai-card p {
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ai-card:hover {
+  box-shadow: 
+    10px 10px 0px rgba(0, 0, 0, 0.4),
+    0 0 50px rgba(102, 126, 234, 0.9);
+  border-color: #00ffff;
+}
+
+.ai-card .card-icon {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}

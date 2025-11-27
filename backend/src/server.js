@@ -1,10 +1,17 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { generatePage } from './generator.js'
 import { publishSite, getSite } from './storage.js'
 import { registerUser, loginUser, getUserById, authMiddleware } from './auth.js'
 import { connectDB } from './db.js'
+import { generateCodeWithAI, improveCode, explainCode, fixCodeErrors, generateRetroWebsite } from './gemini.js'
+import uploadRouter from './routes/upload.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -12,8 +19,14 @@ const PORT = process.env.PORT || 3001
 app.use(cors())
 app.use(express.json())
 
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
+
 // Connect to MongoDB
 await connectDB()
+
+// Upload endpoint
+app.use('/api/upload', uploadRouter)
 
 // Auth endpoints
 app.post('/api/auth/register', async (req, res) => {
@@ -129,6 +142,87 @@ app.get('/site/:siteId', (req, res) => {
   } catch (error) {
     console.error('Retrieval error:', error)
     res.status(500).send('<h1>500 - Server Error</h1>')
+  }
+})
+
+// AI Code Generation Endpoints
+app.post('/api/ai/generate', async (req, res) => {
+  try {
+    const { prompt, codeContext, language } = req.body
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' })
+    }
+
+    const code = await generateCodeWithAI(prompt, codeContext, language)
+    res.json({ code })
+  } catch (error) {
+    console.error('AI generation error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.post('/api/ai/improve', async (req, res) => {
+  try {
+    const { code, instruction, language } = req.body
+
+    if (!code || !instruction) {
+      return res.status(400).json({ error: 'Code and instruction are required' })
+    }
+
+    const improvedCode = await improveCode(code, instruction, language)
+    res.json({ code: improvedCode })
+  } catch (error) {
+    console.error('AI improve error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.post('/api/ai/explain', async (req, res) => {
+  try {
+    const { code, language } = req.body
+
+    if (!code) {
+      return res.status(400).json({ error: 'Code is required' })
+    }
+
+    const explanation = await explainCode(code, language)
+    res.json({ explanation })
+  } catch (error) {
+    console.error('AI explain error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.post('/api/ai/fix', async (req, res) => {
+  try {
+    const { code, language } = req.body
+
+    if (!code) {
+      return res.status(400).json({ error: 'Code is required' })
+    }
+
+    const fixedCode = await fixCodeErrors(code, language)
+    res.json({ code: fixedCode })
+  } catch (error) {
+    console.error('AI fix error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.post('/api/ai/generate-website', async (req, res) => {
+  try {
+    const { description, theme } = req.body
+
+    if (!description) {
+      return res.status(400).json({ error: 'Description is required' })
+    }
+
+    const html = await generateRetroWebsite(description, theme)
+    res.json({ html })
+  } catch (error) {
+    console.error('AI website generation error:', error)
+    res.status(500).json({ error: error.message })
   }
 })
 

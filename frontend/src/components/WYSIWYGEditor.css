@@ -85,3 +85,27 @@
 .editor-content .ProseMirror li {
   margin: 0.25em 0;
 }
+
+.editor-content .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.editor-content .ProseMirror video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.editor-content .ProseMirror a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.editor-content .ProseMirror a:hover {
+  color: #0055aa;
+}
