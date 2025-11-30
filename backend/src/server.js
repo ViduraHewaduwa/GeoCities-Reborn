@@ -4,7 +4,7 @@ import cors from 'cors'
 import { generatePage } from './generator.js'
 import { publishSite, getSite, getUserSites, deleteSite } from './storage.js'
 import { registerUser, loginUser, getUserById, authMiddleware } from './auth.js'
-import { connectDB } from './db.js'
+import { connectDB, getDB } from './db.js'
 import { generateCodeWithAI, improveCode, explainCode, fixCodeErrors, generateRetroWebsite } from './gemini.js'
 import jwt from 'jsonwebtoken'
 
@@ -134,23 +134,36 @@ app.post('/api/publish', async (req, res) => {
 app.get('/site/:siteId', async (req, res) => {
   try {
     const { siteId } = req.params
+    console.log('Fetching site:', siteId)
+    
     const site = await getSite(siteId)
+    console.log('Site found:', site ? 'yes' : 'no')
 
     if (!site) {
-      return res.status(404).send('<h1>404 - Site Not Found</h1>')
+      return res.status(404).send('<h1>404 - Site Not Found</h1><p>Site ID: ' + siteId + '</p>')
     }
 
-    // Increment view count
-    const db = getDB()
-    await db.collection('sites').updateOne(
-      { id: siteId },
-      { $inc: { views: 1 } }
-    )
+    if (!site.html) {
+      console.error('Site has no HTML content:', siteId)
+      return res.status(500).send('<h1>500 - Site has no content</h1>')
+    }
+
+    // Increment view count (non-blocking, don't wait for it)
+    try {
+      const db = getDB()
+      db.collection('sites').updateOne(
+        { id: siteId },
+        { $inc: { views: 1 } }
+      ).catch(err => console.error('View count update error:', err))
+    } catch (viewError) {
+      console.error('View count error:', viewError)
+    }
 
     res.send(site.html)
   } catch (error) {
     console.error('Retrieval error:', error)
-    res.status(500).send('<h1>500 - Server Error</h1>')
+    console.error('Error details:', error.message, error.stack)
+    res.status(500).send('<h1>500 - Server Error</h1><p>' + error.message + '</p>')
   }
 })
 
@@ -258,6 +271,26 @@ app.delete('/api/sites/:siteId', authMiddleware, async (req, res) => {
   }
 })
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'GeoCities Reborn API',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth/*',
+      sites: '/api/sites/*',
+      publish: '/api/publish',
+      view: '/site/:siteId'
+    }
+  })
+})
+
 app.listen(PORT, () => {
   console.log(`🌐 GeoCities Generator API running on http://localhost:${PORT}`)
+  console.log(`📊 Health check: http://localhost:${PORT}/health`)
 })

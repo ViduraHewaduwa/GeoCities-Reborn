@@ -65,7 +65,12 @@ export async function deleteSite(siteId, userId) {
 }
 
 export async function getSite(siteId) {
-  const db = getDB()
-  const site = await db.collection('sites').findOne({ id: siteId })
-  return site
+  try {
+    const db = getDB()
+    const site = await db.collection('sites').findOne({ id: siteId })
+    return site
+  } catch (error) {
+    console.error('getSite error:', error)
+    throw error
+  }
 }
