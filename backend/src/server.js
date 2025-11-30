@@ -2,7 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { generatePage } from './generator.js'
-import { publishSite, getSite, getUserSites, deleteSite } from './storage.js'
+import { publishSite, getSite, getUserSites, deleteSite, getPublicSites, getSitesByCity } from './storage.js'
 import { registerUser, loginUser, getUserById, authMiddleware } from './auth.js'
 import { connectDB, getDB } from './db.js'
 import { generateCodeWithAI, improveCode, explainCode, fixCodeErrors, generateRetroWebsite } from './gemini.js'
@@ -102,7 +102,7 @@ app.post('/api/generate', async (req, res) => {
 // Publish site endpoint (with optional auth)
 app.post('/api/publish', async (req, res) => {
   try {
-    const { html, theme, title } = req.body
+    const { html, theme, title, city } = req.body
 
     if (!html) {
       return res.status(400).json({ error: 'HTML content is required' })
@@ -121,7 +121,7 @@ app.post('/api/publish', async (req, res) => {
       }
     }
 
-    const siteId = await publishSite(html, theme || 'random', userId, title || 'My GeoCities Site')
+    const siteId = await publishSite(html, theme || 'random', userId, title || 'My GeoCities Site', city || 'Area51')
     
     res.json({ siteId })
   } catch (error) {
@@ -268,6 +268,29 @@ app.delete('/api/sites/:siteId', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Delete site error:', error)
     res.status(500).json({ error: 'Failed to delete site' })
+  }
+})
+
+// Get public gallery sites
+app.get('/api/gallery', async (req, res) => {
+  try {
+    const { city, limit } = req.query
+    const sites = await getPublicSites(city, parseInt(limit) || 50)
+    res.json({ sites })
+  } catch (error) {
+    console.error('Gallery error:', error)
+    res.status(500).json({ error: 'Failed to get gallery' })
+  }
+})
+
+// Get sites grouped by city
+app.get('/api/cities', async (req, res) => {
+  try {
+    const cities = await getSitesByCity()
+    res.json({ cities })
+  } catch (error) {
+    console.error('Cities error:', error)
+    res.status(500).json({ error: 'Failed to get cities' })
   }
 })
 

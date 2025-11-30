@@ -1,6 +1,6 @@
 .profile-menu {
   position: relative;
-  z-index: 1000;
+  z-index: 9999;
 }
 
 .profile-button {
@@ -56,6 +56,7 @@
   border: 4px solid #000;
   box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
   animation: dropdownSlide 0.2s ease-out;
+  z-index: 10000;
 }
 
 @keyframes dropdownSlide {

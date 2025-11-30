@@ -5,7 +5,7 @@ function generateSiteId() {
   return randomBytes(8).toString('hex')
 }
 
-export async function publishSite(html, theme, userId = null, title = 'Untitled Site') {
+export async function publishSite(html, theme, userId = null, title = 'Untitled Site', city = 'Area51') {
   const db = getDB()
   const siteId = generateSiteId()
   const siteData = {
@@ -13,6 +13,7 @@ export async function publishSite(html, theme, userId = null, title = 'Untitled 
     html,
     theme,
     title,
+    city,
     userId,
     createdAt: new Date(),
     views: 0
@@ -31,6 +32,7 @@ export async function publishSite(html, theme, userId = null, title = 'Untitled 
             id: siteId,
             title,
             theme,
+            city,
             createdAt: new Date()
           }
         } 
@@ -73,4 +75,40 @@ export async function getSite(siteId) {
     console.error('getSite error:', error)
     throw error
   }
+}
+
+export async function getPublicSites(city = null, limit = 50) {
+  const db = getDB()
+  const query = city ? { city } : {}
+  const sites = await db.collection('sites')
+    .find(query)
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .project({ html: 0 }) // Don't return full HTML in gallery
+    .toArray()
+  return sites
+}
+
+export async function getSitesByCity() {
+  const db = getDB()
+  const sites = await db.collection('sites')
+    .aggregate([
+      {
+        $group: {
+          _id: '$city',
+          count: { $sum: 1 },
+          totalViews: { $sum: '$views' }
+        }
+      },
+      {
+        $project: {
+          city: '$_id',
+          count: 1,
+          totalViews: 1,
+          _id: 0
+        }
+      }
+    ])
+    .toArray()
+  return sites
 }

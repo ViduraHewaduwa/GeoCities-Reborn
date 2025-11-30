@@ -84,7 +84,7 @@ export default function HomePage() {
         </div>
 
         {/* Edit Pages Card */}
-        <div className="retro-card edit-card">
+        <div className="retro-card edit-card" onClick={() => isAuthenticated ? navigate('/profile') : navigate('/login')}>
           <div className="card-header">
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="" className="under-construction" />
           </div>
@@ -92,12 +92,12 @@ export default function HomePage() {
           <h2>EDIT PAGES</h2>
           <p>Manage your retro creations</p>
           <div className="card-footer">
-            <span className="coming-soon">Coming Soon!</span>
+            <span className="click-here">Click Here! →</span>
           </div>
         </div>
 
         {/* Gallery Card */}
-        <div className="retro-card gallery-card">
+        <div className="retro-card gallery-card" onClick={() => navigate('/gallery')}>
           <div className="card-header">
             <span className="hot-badge">🔥 HOT!</span>
           </div>

@@ -7,6 +7,21 @@ import AIAssistant from '../components/AIAssistant'
 import { InputModal, ConfirmModal, AlertModal, FileActionsModal } from '../components/Modal'
 import './BuildPage.css'
 
+const CITIES = [
+  { id: 'Area51', name: 'Area 51', icon: '👽', theme: 'Science fiction and conspiracy theories' },
+  { id: 'Hollywood', name: 'Hollywood', icon: '🎬', theme: 'Film, TV, and entertainment' },
+  { id: 'SiliconValley', name: 'Silicon Valley', icon: '💻', theme: 'Computing and technology' },
+  { id: 'Tokyo', name: 'Tokyo', icon: '🗾', theme: 'Anime and Asian culture' },
+  { id: 'Coliseum', name: 'Coliseum', icon: '⚽', theme: 'Sports' },
+  { id: 'TimeSquare', name: 'Time Square', icon: '🎮', theme: 'Gaming' },
+  { id: 'RodeoDrive', name: 'Rodeo Drive', icon: '🛍️', theme: 'Shopping' },
+  { id: 'WallStreet', name: 'Wall Street', icon: '💰', theme: 'Business' },
+  { id: 'SunsetStrip', name: 'Sunset Strip', icon: '🎸', theme: 'Music and nightlife' },
+  { id: 'WestHollywood', name: 'West Hollywood', icon: '🏳️‍🌈', theme: 'LGBTQ+ community' },
+  { id: 'Paris', name: 'Paris', icon: '🎨', theme: 'Arts' },
+  { id: 'CapitolHill', name: 'Capitol Hill', icon: '🏛️', theme: 'Politics' }
+]
+
 interface FileNode {
   id: string
   name: string
@@ -290,8 +305,10 @@ export default function BuildPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showClearModal, setShowClearModal] = useState(false)
   const [showPublishModal, setShowPublishModal] = useState(false)
+  const [showCitySelectModal, setShowCitySelectModal] = useState(false)
   const [showFileActionsModal, setShowFileActionsModal] = useState(false)
   const [selectedFileForAction, setSelectedFileForAction] = useState<string>('')
+  const [selectedCity, setSelectedCity] = useState('Area51')
   const [publishedUrl, setPublishedUrl] = useState('')
 
   // Auto-save to localStorage
@@ -497,7 +514,11 @@ console.log('Script loaded!');
 
 
 
-  const handlePublish = async () => {
+  const handlePublishClick = () => {
+    setShowCitySelectModal(true)
+  }
+
+  const handlePublish = async (city: string) => {
     try {
       const html = getPreviewHTML()
       const token = localStorage.getItem('token')
@@ -513,7 +534,8 @@ console.log('Script loaded!');
         body: JSON.stringify({ 
           html, 
           theme: 'custom',
-          title: projectName 
+          title: projectName,
+          city 
         }),
       })
 
@@ -638,7 +660,7 @@ console.log('Script loaded!');
                 <button className="tool-btn" onClick={downloadAllFiles} title="Download">
                   💾 Download
                 </button>
-                <button className="tool-btn" onClick={handlePublish} title="Publish">
+                <button className="tool-btn" onClick={handlePublishClick} title="Publish">
                   🌐 Publish
                 </button>
                 <button className="tool-btn danger" onClick={() => setShowClearModal(true)} title="Clear Project">
@@ -788,6 +810,48 @@ console.log('Script loaded!');
         message={`Your page is now live at: ${publishedUrl}`}
         type="success"
       />
+
+      {/* City Selection Modal */}
+      {showCitySelectModal && (
+        <div className="modal-overlay" onClick={() => setShowCitySelectModal(false)}>
+          <div className="modal-content city-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>🏙️ Choose Your Neighborhood</h2>
+              <button className="close-btn" onClick={() => setShowCitySelectModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <p className="city-description">Select which GeoCities neighborhood your site belongs to:</p>
+              <div className="cities-grid-modal">
+                {CITIES.map((city) => (
+                  <button
+                    key={city.id}
+                    className={`city-card-modal ${selectedCity === city.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedCity(city.id)}
+                  >
+                    <div className="city-icon-modal">{city.icon}</div>
+                    <div className="city-name-modal">{city.name}</div>
+                    <div className="city-theme-modal">{city.theme}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="modal-btn cancel" onClick={() => setShowCitySelectModal(false)}>
+                Cancel
+              </button>
+              <button 
+                className="modal-btn confirm" 
+                onClick={() => {
+                  setShowCitySelectModal(false)
+                  handlePublish(selectedCity)
+                }}
+              >
+                🌐 Publish to {CITIES.find(c => c.id === selectedCity)?.name}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <FileActionsModal
         isOpen={showFileActionsModal}

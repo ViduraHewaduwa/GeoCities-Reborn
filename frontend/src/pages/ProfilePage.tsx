@@ -4,10 +4,26 @@ import { useAuth } from '../context/AuthContext'
 import ProfileMenu from '../components/ProfileMenu'
 import './ProfilePage.css'
 
+const CITIES = [
+  { id: 'Area51', name: 'Area 51', icon: '👽' },
+  { id: 'Hollywood', name: 'Hollywood', icon: '🎬' },
+  { id: 'SiliconValley', name: 'Silicon Valley', icon: '💻' },
+  { id: 'Tokyo', name: 'Tokyo', icon: '🗾' },
+  { id: 'Coliseum', name: 'Coliseum', icon: '⚽' },
+  { id: 'TimeSquare', name: 'Time Square', icon: '🎮' },
+  { id: 'RodeoDrive', name: 'Rodeo Drive', icon: '🛍️' },
+  { id: 'WallStreet', name: 'Wall Street', icon: '💰' },
+  { id: 'SunsetStrip', name: 'Sunset Strip', icon: '🎸' },
+  { id: 'WestHollywood', name: 'West Hollywood', icon: '🏳️‍🌈' },
+  { id: 'Paris', name: 'Paris', icon: '🎨' },
+  { id: 'CapitolHill', name: 'Capitol Hill', icon: '🏛️' }
+]
+
 interface Site {
   id: string
   title: string
   theme: string
+  city: string
   createdAt: string
   views: number
 }
@@ -68,6 +84,10 @@ export default function ProfilePage() {
     alert('Link copied to clipboard!')
   }
 
+  const getCityInfo = (cityId: string) => {
+    return CITIES.find(c => c.id === cityId) || { id: 'Area51', name: 'Area 51', icon: '👽' }
+  }
+
   return (
     <div className="profile-page">
       <div className="profile-header">
@@ -120,42 +140,48 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="sites-grid">
-              {sites.map((site) => (
-                <div key={site.id} className="site-card">
-                  <div className="site-header">
-                    <h3>{site.title}</h3>
-                    <span className="site-theme">{site.theme}</span>
+              {sites.map((site) => {
+                const cityInfo = getCityInfo(site.city)
+                return (
+                  <div key={site.id} className="site-card">
+                    <div className="site-city-badge">
+                      {cityInfo.icon} {cityInfo.name}
+                    </div>
+                    <div className="site-header">
+                      <h3>{site.title}</h3>
+                      <span className="site-theme">{site.theme}</span>
+                    </div>
+                    <div className="site-info">
+                      <span className="site-date">
+                        📅 {new Date(site.createdAt).toLocaleDateString()}
+                      </span>
+                      <span className="site-views">
+                        👁️ {site.views} views
+                      </span>
+                    </div>
+                    <div className="site-actions">
+                      <button 
+                        className="action-btn view"
+                        onClick={() => window.open(`https://geocities-reborn-production.up.railway.app/site/${site.id}`, '_blank')}
+                      >
+                        👁️ View
+                      </button>
+                      <button 
+                        className="action-btn copy"
+                        onClick={() => copyToClipboard(site.id)}
+                      >
+                        📋 Copy Link
+                      </button>
+                      <button 
+                        className="action-btn delete"
+                        onClick={() => handleDeleteSite(site.id)}
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
                   </div>
-                  <div className="site-info">
-                    <span className="site-date">
-                      📅 {new Date(site.createdAt).toLocaleDateString()}
-                    </span>
-                    <span className="site-views">
-                      👁️ {site.views} views
-                    </span>
-                  </div>
-                  <div className="site-actions">
-                    <button 
-                      className="action-btn view"
-                      onClick={() => window.open(`https://geocities-reborn-production.up.railway.app/site/${site.id}`, '_blank')}
-                    >
-                      👁️ View
-                    </button>
-                    <button 
-                      className="action-btn copy"
-                      onClick={() => copyToClipboard(site.id)}
-                    >
-                      📋 Copy Link
-                    </button>
-                    <button 
-                      className="action-btn delete"
-                      onClick={() => handleDeleteSite(site.id)}
-                    >
-                      🗑️ Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
