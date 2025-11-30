@@ -2,10 +2,11 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { generatePage } from './generator.js'
-import { publishSite, getSite } from './storage.js'
+import { publishSite, getSite, getUserSites, deleteSite } from './storage.js'
 import { registerUser, loginUser, getUserById, authMiddleware } from './auth.js'
 import { connectDB } from './db.js'
 import { generateCodeWithAI, improveCode, explainCode, fixCodeErrors, generateRetroWebsite } from './gemini.js'
+import jwt from 'jsonwebtoken'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -98,16 +99,29 @@ app.post('/api/generate', async (req, res) => {
   }
 })
 
-// Publish site endpoint
+// Publish site endpoint (with optional auth)
 app.post('/api/publish', async (req, res) => {
   try {
-    const { html, theme } = req.body
+    const { html, theme, title } = req.body
 
     if (!html) {
       return res.status(400).json({ error: 'HTML content is required' })
     }
 
-    const siteId = publishSite(html, theme || 'random')
+    // Check if user is authenticated (optional)
+    let userId = null
+    const authHeader = req.headers.authorization
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'geocities-secret-key-change-in-production')
+        userId = decoded.userId
+      } catch (err) {
+        // Token invalid, publish anonymously
+      }
+    }
+
+    const siteId = await publishSite(html, theme || 'random', userId, title || 'My GeoCities Site')
     
     res.json({ siteId })
   } catch (error) {
@@ -117,14 +131,21 @@ app.post('/api/publish', async (req, res) => {
 })
 
 // View published site endpoint
-app.get('/site/:siteId', (req, res) => {
+app.get('/site/:siteId', async (req, res) => {
   try {
     const { siteId } = req.params
-    const site = getSite(siteId)
+    const site = await getSite(siteId)
 
     if (!site) {
       return res.status(404).send('<h1>404 - Site Not Found</h1>')
     }
+
+    // Increment view count
+    const db = getDB()
+    await db.collection('sites').updateOne(
+      { id: siteId },
+      { $inc: { views: 1 } }
+    )
 
     res.send(site.html)
   } catch (error) {
@@ -211,6 +232,29 @@ app.post('/api/ai/generate-website', async (req, res) => {
   } catch (error) {
     console.error('AI website generation error:', error)
     res.status(500).json({ error: error.message })
+  }
+})
+
+// Get user's published sites
+app.get('/api/user/sites', authMiddleware, async (req, res) => {
+  try {
+    const sites = await getUserSites(req.user.userId)
+    res.json({ sites })
+  } catch (error) {
+    console.error('Get sites error:', error)
+    res.status(500).json({ error: 'Failed to get sites' })
+  }
+})
+
+// Delete a site
+app.delete('/api/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params
+    await deleteSite(siteId, req.user.userId)
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Delete site error:', error)
+    res.status(500).json({ error: 'Failed to delete site' })
   }
 })
 

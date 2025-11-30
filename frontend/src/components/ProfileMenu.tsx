@@ -61,10 +61,9 @@ export default function ProfileMenu() {
               <span className="item-icon">🖊️</span>
               <span>Build Page</span>
             </button>
-            <button className="dropdown-item disabled">
+            <button className="dropdown-item" onClick={() => { setIsOpen(false); navigate('/profile') }}>
               <span className="item-icon">📄</span>
               <span>My Pages</span>
-              <span className="coming-soon-badge">Soon</span>
             </button>
           </div>
           

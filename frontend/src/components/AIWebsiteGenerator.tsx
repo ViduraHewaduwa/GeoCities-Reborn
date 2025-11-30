@@ -26,7 +26,7 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
 
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:3001/api/ai/generate-website', {
+      const response = await fetch('https://geocities-reborn-production.up.railway.app/api/ai/generate-website', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description, theme })

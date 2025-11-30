@@ -23,7 +23,7 @@ function RegisterPage() {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      const response = await fetch('https://geocities-reborn-production.up.railway.app/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })
@@ -36,7 +36,7 @@ function RegisterPage() {
       }
 
       // Auto-login after registration
-      const loginResponse = await fetch('http://localhost:3001/api/auth/login', {
+      const loginResponse = await fetch('https://geocities-reborn-production.up.railway.app/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })

@@ -500,17 +500,28 @@ console.log('Script loaded!');
   const handlePublish = async () => {
     try {
       const html = getPreviewHTML()
-      const response = await fetch('http://localhost:3001/api/publish', {
+      const token = localStorage.getItem('token')
+      
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+      
+      const response = await fetch('https://geocities-reborn-production.up.railway.app/api/publish', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html, theme: 'custom' }),
+        headers,
+        body: JSON.stringify({ 
+          html, 
+          theme: 'custom',
+          title: projectName 
+        }),
       })
 
       const data = await response.json()
-      setPublishedUrl(`${window.location.origin}/site/${data.siteId}`)
+      setPublishedUrl(`https://geocities-reborn-production.up.railway.app/site/${data.siteId}`)
       setShowPublishModal(true)
     } catch (err) {
-      // Handle error
+      alert('Failed to publish site. Please try again.')
     }
   }
 
