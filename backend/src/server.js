@@ -170,13 +170,13 @@ app.get('/site/:siteId', async (req, res) => {
 // AI Code Generation Endpoints
 app.post('/api/ai/generate', async (req, res) => {
   try {
-    const { prompt, codeContext, language } = req.body
+    const { prompt, codeContext, language, theme } = req.body
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' })
     }
 
-    const code = await generateCodeWithAI(prompt, codeContext, language)
+    const code = await generateCodeWithAI(prompt, codeContext, language, theme)
     res.json({ code })
   } catch (error) {
     console.error('AI generation error:', error)

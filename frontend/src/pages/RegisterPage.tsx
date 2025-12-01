@@ -48,6 +48,7 @@ function RegisterPage() {
         localStorage.setItem('token', loginData.token)
         localStorage.setItem('user', JSON.stringify(loginData.user))
         navigate('/')
+        window.location.reload()
       }
     } catch (err: any) {
       setError(err.message)

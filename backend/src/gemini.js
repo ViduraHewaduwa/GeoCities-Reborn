@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
-export async function generateCodeWithAI(prompt, codeContext = '', language = 'html') {
+export async function generateCodeWithAI(prompt, codeContext = '', language = 'html', theme = 'default') {
   try {
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_api_key_here') {
       throw new Error('Gemini API key not configured. Please set GEMINI_API_KEY in .env file')
@@ -10,10 +10,24 @@ export async function generateCodeWithAI(prompt, codeContext = '', language = 'h
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
+    const themeStyles = {
+      cyber: 'Use neon green and cyan colors, matrix-style effects, tech aesthetic with monospace fonts, dark backgrounds, and glowing text effects.',
+      gamer: 'Use bright red, yellow, blue colors, gaming aesthetic with pixel art vibes, bold fonts, and energetic animations.',
+      glitter: 'Use pink, gold, sparkly colors, feminine and glamorous style with gradients, shadows, and decorative elements.',
+      space: 'Use dark blue, stars, cosmic theme with planets and rockets, space-themed colors and celestial elements.',
+      default: 'Use bright neon colors (magenta, cyan, yellow), classic 90s GeoCities style with Comic Sans MS font and retro elements.'
+    }
+
+    const themeInstruction = themeStyles[theme] || themeStyles.default
+
     const systemPrompt = `You are an expert web developer specializing in creating retro 90s GeoCities-style websites. 
 Generate clean, working code with vibrant colors, fun animations, and nostalgic 90s web aesthetics.
-Use inline styles, Comic Sans MS font, bright neon colors, marquees, and retro elements.
-Always return ONLY the code without explanations or markdown formatting.`
+Use inline styles, marquees, and retro elements.
+DO NOT include image tags, GIF references, or external images unless the user specifically requests them.
+Use CSS animations, emojis, and text effects instead.
+Always return ONLY the code without explanations or markdown formatting.
+
+THEME STYLE: ${themeInstruction}`
 
     const fullPrompt = codeContext 
       ? `${systemPrompt}\n\nExisting code:\n${codeContext}\n\nUser request: ${prompt}\n\nGenerate the updated ${language} code:`
@@ -148,7 +162,8 @@ Requirements:
 - Make it nostalgic and fun
 - Use tables for layout (90s style)
 - Add rainbow text effects
-- Include retro GIF-style animations with CSS
+- Use CSS animations instead of GIFs
+- DO NOT include image tags or GIF references unless specifically requested
 
 Return ONLY the complete HTML code without explanations.`
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ProfileMenu from '../components/ProfileMenu'
 import { useAuth } from '../context/AuthContext'
 import './GalleryPage.css'
@@ -28,20 +28,29 @@ interface Site {
   views: number
 }
 
-export default function GalleryPage() {
+export default function NeighborhoodPage() {
   const navigate = useNavigate()
+  const { cityId } = useParams<{ cityId: string }>()
   const { isAuthenticated } = useAuth()
   const [sites, setSites] = useState<Site[]>([])
   const [loading, setLoading] = useState(true)
 
+  const cityInfo = CITIES.find(c => c.id === cityId)
+
   useEffect(() => {
+    if (!cityInfo) {
+      navigate('/gallery')
+      return
+    }
     fetchSites()
-  }, [])
+  }, [cityId])
 
   const fetchSites = async () => {
     setLoading(true)
     try {
-      const response = await fetch('https://geocities-reborn-production.up.railway.app/api/gallery')
+      const response = await fetch(
+        `https://geocities-reborn-production.up.railway.app/api/gallery?city=${cityId}`
+      )
       const data = await response.json()
       setSites(data.sites || [])
     } catch (error) {
@@ -51,41 +60,37 @@ export default function GalleryPage() {
     }
   }
 
-  const getCityInfo = (cityId: string) => {
-    return CITIES.find(c => c.id === cityId) || CITIES[0]
+  if (!cityInfo) {
+    return null
   }
 
   return (
     <div className="gallery-page">
       <div className="gallery-header">
         <div className="header-left">
-          <button className="back-btn" onClick={() => navigate('/')}>
-            ← Back to Home
+          <button className="back-btn" onClick={() => navigate('/gallery')}>
+            ← Back to Gallery
           </button>
-          <h1>🌐 GEOCITIES GALLERY</h1>
+          <h1>{cityInfo.icon} {cityInfo.name}</h1>
         </div>
         {isAuthenticated && <ProfileMenu />}
       </div>
 
-      <div className="cities-section">
-        <h2>🏙️ Browse by Neighborhood</h2>
-        <div className="cities-grid">
-          {CITIES.map((city) => (
-            <button
-              key={city.id}
-              className="city-card"
-              onClick={() => navigate(`/neighborhood/${city.id}`)}
-            >
-              <div className="city-icon">{city.icon}</div>
-              <div className="city-name">{city.name}</div>
-              <div className="city-theme">{city.theme}</div>
-            </button>
-          ))}
+      <div className="neighborhood-info">
+        <div className="neighborhood-banner">
+          <div className="neighborhood-icon">{cityInfo.icon}</div>
+          <div className="neighborhood-details">
+            <h2>{cityInfo.name}</h2>
+            <p>{cityInfo.theme}</p>
+            <div className="neighborhood-stats">
+              <span>📊 {sites.length} sites</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="sites-section">
-        <h2>🌟 Recent Sites</h2>
+        <h2>🌟 Sites in this Neighborhood</h2>
         
         {loading ? (
           <div className="loading">Loading sites...</div>
@@ -100,37 +105,34 @@ export default function GalleryPage() {
           </div>
         ) : (
           <div className="sites-grid">
-            {sites.map((site) => {
-              const cityInfo = getCityInfo(site.city)
-              return (
-                <div 
-                  key={site.id} 
-                  className="site-card"
-                  onClick={() => window.open(`https://geocities-reborn-production.up.railway.app/site/${site.id}`, '_blank')}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="site-city-badge">
-                    {cityInfo.icon} {cityInfo.name}
-                  </div>
-                  <h3>{site.title}</h3>
-                  <div className="site-meta">
-                    <span className="site-views">👁️ {site.views}</span>
-                  </div>
-                  <div className="site-date">
-                    📅 {new Date(site.createdAt).toLocaleDateString()}
-                  </div>
-                  <button
-                    className="visit-btn"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      window.open(`https://geocities-reborn-production.up.railway.app/site/${site.id}`, '_blank')
-                    }}
-                  >
-                    🌐 Visit Site
-                  </button>
+            {sites.map((site) => (
+              <div 
+                key={site.id} 
+                className="site-card"
+                onClick={() => window.open(`https://geocities-reborn-production.up.railway.app/site/${site.id}`, '_blank')}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="site-city-badge">
+                  {cityInfo.icon} {cityInfo.name}
                 </div>
-              )
-            })}
+                <h3>{site.title}</h3>
+                <div className="site-meta">
+                  <span className="site-views">👁️ {site.views}</span>
+                </div>
+                <div className="site-date">
+                  📅 {new Date(site.createdAt).toLocaleDateString()}
+                </div>
+                <button
+                  className="visit-btn"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    window.open(`https://geocities-reborn-production.up.railway.app/site/${site.id}`, '_blank')
+                  }}
+                >
+                  🌐 Visit Site
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>

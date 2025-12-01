@@ -108,19 +108,6 @@ export default function HomePage() {
             <span className="explore">Explore →</span>
           </div>
         </div>
-
-        {/* Upload Card */}
-        <div className="retro-card upload-card">
-          <div className="card-header">
-            <span className="free-badge">FREE!</span>
-          </div>
-          <div className="card-icon">💾</div>
-          <h2>UPLOAD FILES</h2>
-          <p>Import your HTML & images</p>
-          <div className="card-footer">
-            <span className="upload-now">Upload Now →</span>
-          </div>
-        </div>
       </div>
 
       {/* Features Section */}

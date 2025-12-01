@@ -149,7 +149,6 @@ export default function ProfilePage() {
                     </div>
                     <div className="site-header">
                       <h3>{site.title}</h3>
-                      <span className="site-theme">{site.theme}</span>
                     </div>
                     <div className="site-info">
                       <span className="site-date">

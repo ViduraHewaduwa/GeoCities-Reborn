@@ -532,8 +532,7 @@ console.log('Script loaded!');
         method: 'POST',
         headers,
         body: JSON.stringify({ 
-          html, 
-          theme: 'custom',
+          html,
           title: projectName,
           city 
         }),

@@ -31,8 +31,9 @@ function LoginPage() {
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      // Redirect to home
+      // Redirect to home and refresh
       navigate('/')
+      window.location.reload()
     } catch (err: any) {
       setError(err.message)
     } finally {

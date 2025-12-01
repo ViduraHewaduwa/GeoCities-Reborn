@@ -18,6 +18,7 @@ export default function AIAssistant({ currentCode, currentLanguage, onCodeUpdate
   const [prompt, setPrompt] = useState('')
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
+  const [selectedTheme, setSelectedTheme] = useState('default')
   const chatEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -35,7 +36,8 @@ export default function AIAssistant({ currentCode, currentLanguage, onCodeUpdate
         body: JSON.stringify({
           prompt,
           codeContext: currentCode,
-          language: currentLanguage
+          language: currentLanguage,
+          theme: selectedTheme
         })
       })
 
@@ -138,6 +140,22 @@ export default function AIAssistant({ currentCode, currentLanguage, onCodeUpdate
                 <p className="mode-description">
                   Agent mode will directly edit your code based on your instructions.
                 </p>
+                
+                <div className="theme-selector">
+                  <label className="theme-label">🎨 Theme Style (Optional):</label>
+                  <select 
+                    className="theme-select"
+                    value={selectedTheme}
+                    onChange={(e) => setSelectedTheme(e.target.value)}
+                  >
+                    <option value="default">🌈 Classic 90s (Default)</option>
+                    <option value="cyber">🤖 Cyber/Matrix</option>
+                    <option value="gamer">🎮 Gamer</option>
+                    <option value="glitter">✨ Glitter/Sparkle</option>
+                    <option value="space">🚀 Space/Cosmic</option>
+                  </select>
+                </div>
+
                 <textarea
                   className="ai-input"
                   placeholder="E.g., Add a rainbow gradient background with stars..."
