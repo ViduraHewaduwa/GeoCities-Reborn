@@ -123,18 +123,6 @@
 - [x] Session persistence
 - [x] Logout functionality
 
-### ✏️ Site Editing
-- [x] Edit published sites
-- [x] Visual WYSIWYG editor
-- [x] Code editor mode
-- [x] Toggle between editors
-- [x] Update site title
-- [x] Change site theme
-- [x] Live preview while editing
-- [x] Save changes
-- [x] Permission validation
-- [x] Edit button in profile
-
 ### 🎨 Retro Homepage
 - [x] GeoCities-style design
 - [x] Animated elements

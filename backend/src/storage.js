@@ -112,35 +112,3 @@ export async function getSitesByCity() {
     .toArray()
   return sites
 }
-
-export async function updateSite(siteId, updates) {
-  const db = getDB()
-  const { ObjectId } = await import('mongodb')
-  
-  const updateData = {}
-  if (updates.html) updateData.html = updates.html
-  if (updates.title) updateData.title = updates.title
-  if (updates.theme) updateData.theme = updates.theme
-  
-  const result = await db.collection('sites').updateOne(
-    { id: siteId },
-    { $set: updateData }
-  )
-  
-  // Update in user's sites array if title or theme changed
-  if (updates.title || updates.theme) {
-    const site = await db.collection('sites').findOne({ id: siteId })
-    if (site && site.userId) {
-      const userUpdate = {}
-      if (updates.title) userUpdate['sites.$.title'] = updates.title
-      if (updates.theme) userUpdate['sites.$.theme'] = updates.theme
-      
-      await db.collection('users').updateOne(
-        { _id: new ObjectId(site.userId), 'sites.id': siteId },
-        { $set: userUpdate }
-      )
-    }
-  }
-  
-  return result.modifiedCount > 0
-}

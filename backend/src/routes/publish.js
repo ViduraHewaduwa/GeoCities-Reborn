@@ -1,6 +1,6 @@
 import express from 'express'
 import { generatePage } from '../generator.js'
-import { publishSite, getSite, updateSite } from '../storage.js'
+import { publishSite, getSite } from '../storage.js'
 
 const router = express.Router()
 
@@ -59,29 +59,6 @@ router.get('/site/:siteId', async (req, res) => {
   } catch (error) {
     console.error('Retrieval error:', error)
     res.status(500).send('<h1>500 - Server Error</h1>')
-  }
-})
-
-router.put('/sites/:siteId', async (req, res) => {
-  try {
-    const { siteId } = req.params
-    const { html, title, theme } = req.body
-
-    if (!html) {
-      return res.status(400).json({ error: 'HTML content is required' })
-    }
-
-    // Update site in storage
-    const updated = await updateSite(siteId, { html, title, theme })
-    
-    if (!updated) {
-      return res.status(404).json({ error: 'Site not found' })
-    }
-
-    res.json({ success: true, siteId })
-  } catch (error) {
-    console.error('Update error:', error)
-    res.status(500).json({ error: 'Failed to update site' })
   }
 })
 
