@@ -2,7 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { generatePage } from './generator.js'
-import { publishSite, getSite, getUserSites, deleteSite, getPublicSites, getSitesByCity } from './storage.js'
+import { publishSite, getSite, getUserSites, updateSite, deleteSite, getPublicSites, getSitesByCity } from './storage.js'
 import { registerUser, loginUser, getUserById, authMiddleware } from './auth.js'
 import { connectDB, getDB } from './db.js'
 import { generateCodeWithAI, improveCode, explainCode, fixCodeErrors, generateRetroWebsite } from './gemini.js'
@@ -256,6 +256,51 @@ app.get('/api/user/sites', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Get sites error:', error)
     res.status(500).json({ error: 'Failed to get sites' })
+  }
+})
+
+// Get a single site for editing
+app.get('/api/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params
+    const site = await getSite(siteId)
+    
+    if (!site) {
+      return res.status(404).json({ error: 'Site not found' })
+    }
+
+    // Only allow owner to get full HTML
+    if (site.userId !== req.user.userId) {
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    res.json({ html: site.html, title: site.title, city: site.city })
+  } catch (error) {
+    console.error('Get site error:', error)
+    res.status(500).json({ error: 'Failed to get site' })
+  }
+})
+
+// Update a site
+app.put('/api/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params
+    const { html } = req.body
+
+    if (!html) {
+      return res.status(400).json({ error: 'HTML content is required' })
+    }
+
+    const updated = await updateSite(siteId, req.user.userId, html)
+    
+    if (!updated) {
+      return res.status(404).json({ error: 'Site not found or unauthorized' })
+    }
+
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Update site error:', error)
+    res.status(500).json({ error: 'Failed to update site' })
   }
 })
 

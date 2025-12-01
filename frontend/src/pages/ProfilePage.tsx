@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import ProfileMenu from '../components/ProfileMenu'
+import WYSIWYGEditor from '../components/WYSIWYGEditor'
 import './ProfilePage.css'
 
 const CITIES = [
@@ -33,6 +34,10 @@ export default function ProfilePage() {
   const { isAuthenticated, user } = useAuth()
   const [sites, setSites] = useState<Site[]>([])
   const [loading, setLoading] = useState(true)
+  const [editingSite, setEditingSite] = useState<Site | null>(null)
+  const [editedHTML, setEditedHTML] = useState('')
+  const [editMode, setEditMode] = useState<'preview' | 'edit'>('edit')
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -57,6 +62,49 @@ export default function ProfilePage() {
       console.error('Failed to fetch sites:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleEditSite = async (site: Site) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`https://geocities-reborn-production.up.railway.app/api/sites/${site.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      const data = await response.json()
+      setEditedHTML(data.html || '')
+      setEditingSite(site)
+      setEditMode('edit')
+    } catch (error) {
+      alert('Failed to load site for editing')
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingSite) return
+
+    setIsSaving(true)
+    try {
+      const token = localStorage.getItem('token')
+      await fetch(`https://geocities-reborn-production.up.railway.app/api/sites/${editingSite.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ html: editedHTML })
+      })
+
+      alert('Site updated successfully!')
+      setEditingSite(null)
+      fetchSites()
+    } catch (error) {
+      alert('Failed to save changes')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -100,7 +148,59 @@ export default function ProfilePage() {
         <ProfileMenu />
       </div>
 
-      <div className="profile-content">
+      {editingSite ? (
+        <div className="editor-overlay">
+          <div className="editor-container-full">
+            <div className="editor-header">
+              <h2>✏️ Editing: {editingSite.title}</h2>
+              <div className="editor-actions">
+                <button 
+                  className={`mode-btn ${editMode === 'edit' ? 'active' : ''}`}
+                  onClick={() => setEditMode('edit')}
+                >
+                  ✏️ Edit
+                </button>
+                <button 
+                  className={`mode-btn ${editMode === 'preview' ? 'active' : ''}`}
+                  onClick={() => setEditMode('preview')}
+                >
+                  👁️ Preview
+                </button>
+                <button 
+                  className="save-btn"
+                  onClick={handleSaveEdit}
+                  disabled={isSaving}
+                >
+                  {isSaving ? '💾 Saving...' : '💾 Save Changes'}
+                </button>
+                <button 
+                  className="cancel-btn"
+                  onClick={() => setEditingSite(null)}
+                >
+                  ✕ Cancel
+                </button>
+              </div>
+            </div>
+            <div className="editor-content-area">
+              {editMode === 'edit' ? (
+                <WYSIWYGEditor 
+                  content={editedHTML}
+                  onChange={setEditedHTML}
+                />
+              ) : (
+                <div className="preview-frame">
+                  <iframe
+                    srcDoc={editedHTML}
+                    title="Preview"
+                    sandbox="allow-scripts"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="profile-content">
         <div className="profile-info">
           <div className="user-card">
             <div className="user-avatar">👤</div>
@@ -160,6 +260,12 @@ export default function ProfilePage() {
                     </div>
                     <div className="site-actions">
                       <button 
+                        className="action-btn edit"
+                        onClick={() => handleEditSite(site)}
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button 
                         className="action-btn view"
                         onClick={() => window.open(`https://geocities-reborn-production.up.railway.app/site/${site.id}`, '_blank')}
                       >
@@ -184,7 +290,8 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -52,6 +52,24 @@ export async function getUserSites(userId) {
   return sites
 }
 
+export async function updateSite(siteId, userId, html) {
+  const db = getDB()
+  const { ObjectId } = await import('mongodb')
+  
+  // Update site in sites collection
+  const result = await db.collection('sites').updateOne(
+    { id: siteId, userId },
+    { 
+      $set: { 
+        html,
+        updatedAt: new Date()
+      } 
+    }
+  )
+  
+  return result.modifiedCount > 0
+}
+
 export async function deleteSite(siteId, userId) {
   const db = getDB()
   const { ObjectId } = await import('mongodb')
