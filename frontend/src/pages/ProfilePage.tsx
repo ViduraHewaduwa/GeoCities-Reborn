@@ -167,6 +167,12 @@ export default function ProfilePage() {
                         👁️ View
                       </button>
                       <button 
+                        className="action-btn edit"
+                        onClick={() => navigate(`/edit/${site.id}`)}
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button 
                         className="action-btn copy"
                         onClick={() => copyToClipboard(site.id)}
                       >

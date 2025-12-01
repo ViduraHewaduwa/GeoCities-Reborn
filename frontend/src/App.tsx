@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import GalleryPage from './pages/GalleryPage'
+import NeighborhoodPage from './pages/NeighborhoodPage'
+import EditPage from './pages/EditPage'
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/neighborhood/:cityId" element={<NeighborhoodPage />} />
+          <Route path="/edit/:siteId" element={<EditPage />} />
         </Routes>
       </Router>
     </AuthProvider>

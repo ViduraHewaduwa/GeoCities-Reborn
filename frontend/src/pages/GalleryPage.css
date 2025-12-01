@@ -116,21 +116,95 @@
   line-height: 1.3;
 }
 
-.sites-section {
+.neighborhoods-section {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.neighborhood-block {
   background: rgba(255, 255, 255, 0.95);
   border: 4px solid #000;
   box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+  padding: 30px;
 }
 
-.sites-section h2 {
+.neighborhood-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #000;
+}
+
+.neighborhood-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.neighborhood-icon {
+  font-size: 40px;
+}
+
+.neighborhood-title h2 {
   color: #0000cc;
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 32px;
+  margin: 0;
   font-family: 'Impact', 'Arial Black', sans-serif;
   text-shadow: 2px 2px 0 #ffff00;
+}
+
+.site-count {
+  background: linear-gradient(90deg, #ff00ff, #00ffff);
+  color: white;
+  padding: 4px 12px;
+  border: 2px solid #000;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.neighborhood-theme {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+  font-style: italic;
+}
+
+.empty-neighborhood {
+  text-align: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+}
+
+.empty-neighborhood p {
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.create-btn-small {
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #ff00ff, #00ffff);
+  border: 3px solid #000;
+  border-radius: 0;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+.create-btn-small:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.3);
 }
 
 .loading {
@@ -192,7 +266,8 @@
   padding: 20px;
   box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.3);
   transition: all 0.3s;
-  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .site-card:hover {
@@ -201,26 +276,13 @@
   border-color: #ffff00;
 }
 
-.site-city-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: linear-gradient(90deg, #ff00ff, #00ffff);
-  color: white;
-  padding: 4px 10px;
-  border: 2px solid #000;
-  font-size: 12px;
-  font-weight: bold;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
-}
-
 .site-card h3 {
   color: #0000cc;
-  font-size: 20px;
+  font-size: 18px;
   margin: 0 0 15px 0;
   font-family: 'Impact', 'Arial Black', sans-serif;
   text-shadow: 1px 1px 0 #ffff00;
-  padding-right: 100px;
+  word-wrap: break-word;
 }
 
 .site-meta {
@@ -292,4 +354,102 @@
   .header-left h1 {
     font-size: 20px;
   }
+}
+
+.city-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(90deg, #ff00ff, #00ffff);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.city-card {
+  position: relative;
+}
+
+.filter-indicator {
+  background: linear-gradient(90deg, #ffff00, #ffcc00);
+  border: 3px solid #000;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.clear-filter {
+  background: #ff0000;
+  color: white;
+  border: 2px solid #000;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+.clear-filter:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.neighborhoods-section {
+  scroll-margin-top: 20px;
+}
+
+.cities-description {
+  text-align: center;
+  color: #00ffff;
+  font-size: 16px;
+  margin: -10px 0 20px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.view-all-btn {
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #ff00ff, #00ffff);
+  border: 3px solid #000;
+  border-radius: 0;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+.view-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.3);
+}
+
+.neighborhood-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.neighborhoods-section > h2 {
+  color: #ffff00;
+  font-size: 32px;
+  margin-bottom: 30px;
+  text-align: center;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }

@@ -259,6 +259,63 @@ app.get('/api/user/sites', authMiddleware, async (req, res) => {
   }
 })
 
+// Get site for editing
+app.get('/api/sites/:siteId/edit', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params
+    const site = await getSite(siteId)
+    
+    if (!site) {
+      return res.status(404).json({ error: 'Site not found' })
+    }
+    
+    // Check if user owns this site
+    if (site.userId !== req.user.userId) {
+      return res.status(403).json({ error: 'You do not have permission to edit this site' })
+    }
+    
+    res.json({ 
+      html: site.html, 
+      title: site.title, 
+      theme: site.theme,
+      city: site.city
+    })
+  } catch (error) {
+    console.error('Get site for edit error:', error)
+    res.status(500).json({ error: 'Failed to get site' })
+  }
+})
+
+// Update a site
+app.put('/api/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params
+    const { html, title, theme } = req.body
+    
+    // Verify ownership
+    const site = await getSite(siteId)
+    if (!site) {
+      return res.status(404).json({ error: 'Site not found' })
+    }
+    
+    if (site.userId !== req.user.userId) {
+      return res.status(403).json({ error: 'You do not have permission to edit this site' })
+    }
+    
+    const { updateSite } = await import('./storage.js')
+    const updated = await updateSite(siteId, { html, title, theme })
+    
+    if (!updated) {
+      return res.status(500).json({ error: 'Failed to update site' })
+    }
+    
+    res.json({ success: true, siteId })
+  } catch (error) {
+    console.error('Update site error:', error)
+    res.status(500).json({ error: 'Failed to update site' })
+  }
+})
+
 // Delete a site
 app.delete('/api/sites/:siteId', authMiddleware, async (req, res) => {
   try {

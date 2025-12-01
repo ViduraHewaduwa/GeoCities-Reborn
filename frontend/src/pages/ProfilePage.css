@@ -258,6 +258,15 @@
   background: #45a049;
 }
 
+.action-btn.edit {
+  background: #ff9800;
+  color: white;
+}
+
+.action-btn.edit:hover {
+  background: #e68900;
+}
+
 .action-btn.copy {
   background: #2196f3;
   color: white;
