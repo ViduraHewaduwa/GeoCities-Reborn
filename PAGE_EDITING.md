@@ -1,27 +1,38 @@
 # Page Editing Feature
 
 ## Overview
-Users can now edit their published pages using a WYSIWYG (What You See Is What You Get) editor, similar to the existing editor used in the PageBuilder component.
+Users can now edit their published pages using the **exact same multi-file editor interface** from BuildPage, providing a professional VS Code-like editing experience with file explorer and multi-file support.
 
 ## Features
 
 ### 1. Edit Button on Profile Page
 - Each published site card now has an **✏️ Edit** button
-- Clicking it opens a full-screen editor overlay
+- Clicking it opens the full BuildPage-style editor
 - Only the site owner can edit their pages
 
-### 2. WYSIWYG Editor
-- Rich text editing with formatting toolbar
-- **Bold**, *Italic*, <u>Underline</u> text
-- Headings (H1, H2) and paragraphs
-- Bullet and numbered lists
-- Text color picker
-- Same editor used in PageBuilder for consistency
+### 2. Multi-File Editor (Identical to BuildPage)
+- **File Explorer**: Left sidebar showing all files (HTML, CSS, JS)
+- **Monaco Code Editor**: Professional code editor with syntax highlighting
+- **Live Preview Panel**: Real-time preview (toggleable)
+- **File Search**: Search through files in the explorer
+- **Syntax Highlighting**: HTML, CSS, JavaScript support
+- **Auto-completion and IntelliSense**
+- **Line numbers and code folding**
 
-### 3. Edit Modes
-- **✏️ Edit Mode**: WYSIWYG editor for visual editing
-- **👁️ Preview Mode**: See how the page will look live
-- Toggle between modes with buttons
+### 3. File Management
+- **Automatic File Parsing**: HTML is split into separate files:
+  - `index.html` - Main HTML structure
+  - `style.css` - Extracted from `<style>` tags
+  - `script.js` - Extracted from `<script>` tags
+- **File Switching**: Click files in explorer to edit
+- **File Icons**: Visual indicators for file types (📄 HTML, 🎨 CSS, ⚡ JS)
+- **Active File Highlighting**: Current file highlighted in explorer
+
+### 4. Layout (Exact BuildPage Match)
+- **Left**: File explorer with search
+- **Center**: Code editor panel
+- **Right**: Live preview panel (toggleable)
+- **Top**: Toolbar with actions
 
 ### 4. Save & Cancel
 - **💾 Save Changes**: Updates the published site
@@ -33,17 +44,26 @@ Users can now edit their published pages using a WYSIWYG (What You See Is What Y
 1. Go to **My Profile** page
 2. Find the site you want to edit
 3. Click **✏️ Edit** button
-4. Make changes in the WYSIWYG editor
-5. Switch to **Preview** to see results
-6. Click **💾 Save Changes** to publish updates
-7. Or click **✕ Cancel** to discard changes
+4. Site opens in BuildPage-style editor with files parsed:
+   - HTML content in `index.html`
+   - CSS extracted to `style.css`
+   - JavaScript extracted to `script.js`
+5. Click files in explorer to switch between them
+6. Edit code in Monaco editor
+7. Toggle **👁️ Show/Hide Preview** to see live changes
+8. Click **💾 Save Changes** to publish updates
+9. Or click **✕ Cancel** to discard changes
 
 ## Technical Implementation
 
 ### Frontend
-- **ProfilePage.tsx**: Added editor overlay and state management
-- **WYSIWYGEditor.tsx**: Reused existing TipTap editor component
-- **ProfilePage.css**: Added editor overlay styles
+- **ProfilePage.tsx**: 
+  - Added multi-file editor interface (exact copy of BuildPage)
+  - HTML parsing logic to split into separate files
+  - File explorer, search, and file switching
+  - Preview HTML generation from multiple files
+- **CodeEditor.tsx**: Reused existing Monaco editor component
+- **ProfilePage.css**: Added BuildPage-style editor CSS (file explorer, panels, toolbar)
 
 ### Backend
 - **storage.js**: Added `updateSite()` function
@@ -91,10 +111,12 @@ Response:
 
 ## UI/UX
 - Full-screen overlay for distraction-free editing
-- Gradient header matching site theme
+- VS Code dark theme matching BuildPage
+- Split-panel layout with code and preview
 - Responsive design for mobile and desktop
-- Clear visual feedback for active mode
+- Toggle preview panel on/off
 - Disabled save button while saving
+- Professional code editing experience
 
 ## Future Enhancements
 - [ ] Auto-save drafts

@@ -59,7 +59,7 @@ export default function HomePage() {
           <span className="title-geo">GeoCities</span>
           <span className="title-reborn">Reborn</span>
         </h1>
-        <div className="tagline">✨ Build Your Dream 90s Website ✨</div>
+        <div className="tagline">✨ The classic GeoCities experience, rebuilt for today ✨</div>
 
         <div className="subtitle-box">
           <div className="marquee-text">
