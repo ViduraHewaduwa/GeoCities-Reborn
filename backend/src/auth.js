@@ -4,22 +4,15 @@ import { getDB } from './db.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'geocities-secret-key-change-in-production'
 
-export async function registerUser(username, email, password) {
+export async function registerUser(username, password) {
   const db = getDB()
   const usersCollection = db.collection('users')
   
   // Check if user already exists
-  const existingUser = await usersCollection.findOne({
-    $or: [{ username }, { email }]
-  })
+  const existingUser = await usersCollection.findOne({ username })
   
   if (existingUser) {
-    if (existingUser.username === username) {
-      throw new Error('Username already exists')
-    }
-    if (existingUser.email === email) {
-      throw new Error('Email already exists')
-    }
+    throw new Error('Username already exists')
   }
   
   // Hash password
@@ -27,7 +20,6 @@ export async function registerUser(username, email, password) {
   
   const newUser = {
     username,
-    email,
     password: hashedPassword,
     createdAt: new Date(),
     sites: []
@@ -44,9 +36,7 @@ export async function loginUser(username, password) {
   const db = getDB()
   const usersCollection = db.collection('users')
   
-  const user = await usersCollection.findOne({
-    $or: [{ username }, { email: username }]
-  })
+  const user = await usersCollection.findOne({ username })
   
   if (!user) {
     throw new Error('Invalid credentials')

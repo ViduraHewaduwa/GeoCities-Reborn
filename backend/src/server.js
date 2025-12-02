@@ -20,9 +20,9 @@ await connectDB()
 // Auth endpoints
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { username, email, password } = req.body
+    const { username, password } = req.body
 
-    if (!username || !email || !password) {
+    if (!username || !password) {
       return res.status(400).json({ error: 'All fields are required' })
     }
 
@@ -34,7 +34,7 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' })
     }
 
-    const user = await registerUser(username, email, password)
+    const user = await registerUser(username, password)
     res.status(201).json({ user })
   } catch (error) {
     console.error('Registration error:', error)
