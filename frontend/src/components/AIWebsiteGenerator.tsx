@@ -12,6 +12,7 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
   const [description, setDescription] = useState('')
   const [theme, setTheme] = useState('default')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const themes = [
     { id: 'default', name: 'Classic 90s', emoji: '🌈', color: '#ff00ff' },
@@ -25,6 +26,8 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
     if (!description.trim()) return
 
     setLoading(true)
+    setError(null)
+    
     try {
       const response = await fetch('https://geocities-reborn-production.up.railway.app/api/ai/generate-website', {
         method: 'POST',
@@ -47,11 +50,11 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
         localStorage.setItem('editor-project-name', description.substring(0, 50))
         navigate('/build')
       } else if (data.error) {
-        alert(`AI Error: ${data.error}`)
+        setError(`AI Error: ${data.error}`)
       }
     } catch (error) {
       console.error('AI generation error:', error)
-      alert('Failed to generate website. Make sure:\n1. Backend server is running\n2. Gemini API key is set in backend/.env\n3. You have internet connection')
+      setError('Failed to generate website. Make sure backend server is running and Gemini API key is configured.')
     } finally {
       setLoading(false)
     }
@@ -68,6 +71,16 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
         </div>
 
         <div className="ai-modal-content">
+          <div className="ai-time-notice">
+            ⏱️ Website generation takes 20-80 seconds • Powered by Gemini 2.0 Flash
+          </div>
+
+          {error && (
+            <div className="ai-error-message">
+              ⚠️ {error}
+            </div>
+          )}
+
           <div className="ai-section">
             <label className="ai-label">What kind of website do you want?</label>
             <textarea
@@ -76,6 +89,7 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
+              disabled={loading}
             />
           </div>
 
@@ -88,6 +102,7 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
                   className={`theme-card ${theme === t.id ? 'selected' : ''}`}
                   onClick={() => setTheme(t.id)}
                   style={{ borderColor: theme === t.id ? t.color : '#ccc' }}
+                  disabled={loading}
                 >
                   <div className="theme-emoji">{t.emoji}</div>
                   <div className="theme-name">{t.name}</div>
@@ -101,11 +116,11 @@ export default function AIWebsiteGenerator({ isOpen, onClose }: AIWebsiteGenerat
             onClick={handleGenerate}
             disabled={loading || !description.trim()}
           >
-            {loading ? '⏳ Generating...' : '✨ Generate Website'}
+            {loading ? '⏳ Generating... (20-80s)' : '✨ Generate Website'}
           </button>
 
           <div className="ai-note">
-            💡 Powered by Google Gemini AI - Be creative with your description!
+            💡 Be creative with your description!
           </div>
         </div>
       </div>
