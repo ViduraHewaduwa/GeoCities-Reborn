@@ -221,12 +221,13 @@
 }
 
 .site-card h3 {
-  color: #0000cc;
+  color: #000000;
   font-size: 20px;
   margin: 0 0 15px 0;
   font-family: 'Impact', 'Arial Black', sans-serif;
-  text-shadow: 1px 1px 0 #ffff00;
+  text-shadow: 2px 2px 0 #ffff00;
   padding-right: 100px;
+  font-weight: 900;
 }
 
 .site-meta {

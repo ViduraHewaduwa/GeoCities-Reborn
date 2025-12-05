@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 export async function generateCodeWithAI(prompt, codeContext = '', language = 'html', theme = 'default') {
   try {
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_api_key_here') {
-      throw new Error('Gemini API key not configured. Please set GEMINI_API_KEY in .env file')
+      throw new Error('API_KEY_MISSING: Gemini API key not configured. Please set GEMINI_API_KEY in .env file')
     }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
@@ -37,20 +37,43 @@ THEME STYLE: ${themeInstruction}`
     const response = result.response
     let code = response.text()
 
+    if (!code || code.trim().length === 0) {
+      throw new Error('EMPTY_RESPONSE: AI returned empty response. Try rephrasing your request.')
+    }
+
     // Clean up markdown code blocks if present
     code = code.replace(/```html\n?/g, '').replace(/```css\n?/g, '').replace(/```javascript\n?/g, '').replace(/```\n?/g, '')
     
     return code.trim()
   } catch (error) {
-    console.error('Gemini API Error Details:', error.message, error.status)
-    throw new Error(error.message || 'Failed to generate code with AI')
+    console.error('Gemini API Error Details:', {
+      message: error.message,
+      status: error.status,
+      statusText: error.statusText,
+      timestamp: new Date().toISOString()
+    })
+    
+    // Provide user-friendly error messages
+    if (error.message?.includes('API_KEY_MISSING')) {
+      throw error
+    } else if (error.message?.includes('EMPTY_RESPONSE')) {
+      throw error
+    } else if (error.status === 429) {
+      throw new Error('RATE_LIMIT: Too many requests. Please wait a moment and try again.')
+    } else if (error.status === 503 || error.status === 500) {
+      throw new Error('SERVICE_UNAVAILABLE: AI service is temporarily unavailable. Please try again in a few seconds.')
+    } else if (error.message?.includes('fetch')) {
+      throw new Error('NETWORK_ERROR: Network connection failed. Check your internet connection.')
+    } else {
+      throw new Error(`AI_ERROR: ${error.message || 'Failed to generate code. Please try again.'}`)
+    }
   }
 }
 
 export async function improveCode(code, instruction, language = 'html') {
   try {
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_api_key_here') {
-      throw new Error('Gemini API key not configured')
+      throw new Error('API_KEY_MISSING: Gemini API key not configured')
     }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
@@ -67,20 +90,33 @@ Return ONLY the improved code without explanations or markdown formatting.`
     const response = result.response
     let improvedCode = response.text()
 
+    if (!improvedCode || improvedCode.trim().length === 0) {
+      throw new Error('EMPTY_RESPONSE: AI returned empty response. Try rephrasing your request.')
+    }
+
     // Clean up markdown code blocks
     improvedCode = improvedCode.replace(/```html\n?/g, '').replace(/```css\n?/g, '').replace(/```javascript\n?/g, '').replace(/```\n?/g, '')
     
     return improvedCode.trim()
   } catch (error) {
     console.error('Gemini API Error:', error.message)
-    throw new Error(error.message || 'Failed to improve code with AI')
+    
+    if (error.message?.includes('API_KEY_MISSING') || error.message?.includes('EMPTY_RESPONSE')) {
+      throw error
+    } else if (error.status === 429) {
+      throw new Error('RATE_LIMIT: Too many requests. Please wait and try again.')
+    } else if (error.status === 503 || error.status === 500) {
+      throw new Error('SERVICE_UNAVAILABLE: AI service temporarily unavailable.')
+    } else {
+      throw new Error(`AI_ERROR: ${error.message || 'Failed to improve code'}`)
+    }
   }
 }
 
 export async function explainCode(code, language = 'html') {
   try {
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_api_key_here') {
-      throw new Error('Gemini API key not configured')
+      throw new Error('API_KEY_MISSING: Gemini API key not configured')
     }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
@@ -93,17 +129,32 @@ Provide a brief, friendly explanation.`
 
     const result = await model.generateContent(prompt)
     const response = result.response
-    return response.text()
+    const explanation = response.text()
+    
+    if (!explanation || explanation.trim().length === 0) {
+      throw new Error('EMPTY_RESPONSE: AI returned empty response.')
+    }
+    
+    return explanation
   } catch (error) {
     console.error('Gemini API Error:', error.message)
-    throw new Error(error.message || 'Failed to explain code')
+    
+    if (error.message?.includes('API_KEY_MISSING') || error.message?.includes('EMPTY_RESPONSE')) {
+      throw error
+    } else if (error.status === 429) {
+      throw new Error('RATE_LIMIT: Too many requests. Please wait and try again.')
+    } else if (error.status === 503 || error.status === 500) {
+      throw new Error('SERVICE_UNAVAILABLE: AI service temporarily unavailable.')
+    } else {
+      throw new Error(`AI_ERROR: ${error.message || 'Failed to explain code'}`)
+    }
   }
 }
 
 export async function fixCodeErrors(code, language = 'html') {
   try {
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_api_key_here') {
-      throw new Error('Gemini API key not configured')
+      throw new Error('API_KEY_MISSING: Gemini API key not configured')
     }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
@@ -118,20 +169,33 @@ Return ONLY the fixed code without explanations or markdown formatting.`
     const response = result.response
     let fixedCode = response.text()
 
+    if (!fixedCode || fixedCode.trim().length === 0) {
+      throw new Error('EMPTY_RESPONSE: AI returned empty response.')
+    }
+
     // Clean up markdown code blocks
     fixedCode = fixedCode.replace(/```html\n?/g, '').replace(/```css\n?/g, '').replace(/```javascript\n?/g, '').replace(/```\n?/g, '')
     
     return fixedCode.trim()
   } catch (error) {
     console.error('Gemini API Error:', error.message)
-    throw new Error(error.message || 'Failed to fix code')
+    
+    if (error.message?.includes('API_KEY_MISSING') || error.message?.includes('EMPTY_RESPONSE')) {
+      throw error
+    } else if (error.status === 429) {
+      throw new Error('RATE_LIMIT: Too many requests. Please wait and try again.')
+    } else if (error.status === 503 || error.status === 500) {
+      throw new Error('SERVICE_UNAVAILABLE: AI service temporarily unavailable.')
+    } else {
+      throw new Error(`AI_ERROR: ${error.message || 'Failed to fix code'}`)
+    }
   }
 }
 
 export async function generateRetroWebsite(description, theme = 'default') {
   try {
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_api_key_here') {
-      throw new Error('Gemini API key not configured')
+      throw new Error('API_KEY_MISSING: Gemini API key not configured')
     }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
@@ -171,12 +235,25 @@ Return ONLY the complete HTML code without explanations.`
     const response = result.response
     let html = response.text()
 
+    if (!html || html.trim().length === 0) {
+      throw new Error('EMPTY_RESPONSE: AI returned empty response. Try a different description.')
+    }
+
     // Clean up markdown code blocks
     html = html.replace(/```html\n?/g, '').replace(/```\n?/g, '')
     
     return html.trim()
   } catch (error) {
     console.error('Gemini API Error:', error.message)
-    throw new Error(error.message || 'Failed to generate website')
+    
+    if (error.message?.includes('API_KEY_MISSING') || error.message?.includes('EMPTY_RESPONSE')) {
+      throw error
+    } else if (error.status === 429) {
+      throw new Error('RATE_LIMIT: Too many requests. Please wait and try again.')
+    } else if (error.status === 503 || error.status === 500) {
+      throw new Error('SERVICE_UNAVAILABLE: AI service temporarily unavailable.')
+    } else {
+      throw new Error(`AI_ERROR: ${error.message || 'Failed to generate website'}`)
+    }
   }
 }
