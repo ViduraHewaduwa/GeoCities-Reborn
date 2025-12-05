@@ -1,0 +1,49 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": ["fetch"]
+    },
+    "filesystem": {
+      "command": "uvx",
+      "args": ["mcp-server-filesystem", "C:\\Users\\User\\Documents\\GitHub\\GeoCities-Reborn"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": ["read_file", "list_directory"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "C:\\Users\\User\\Documents\\GitHub\\GeoCities-Reborn"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": ["git_status", "git_log"]
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-mongodb", "mongodb+srv://your-connection-string"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": true,
+      "autoApprove": []
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": ["puppeteer_navigate"]
+    }
+  }
+}

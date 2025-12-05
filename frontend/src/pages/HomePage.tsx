@@ -8,6 +8,7 @@ export default function HomePage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const [stars, setStars] = useState<Array<{ x: number; y: number; size: number }>>([])
+  const [visitorCount, setVisitorCount] = useState(0)
 
   useEffect(() => {
     const starArray = Array.from({ length: 100 }, () => ({
@@ -16,6 +17,44 @@ export default function HomePage() {
       size: Math.random() * 3 + 1,
     }))
     setStars(starArray)
+
+    // Visitor counter logic
+    const VISITOR_KEY = 'geocities-visitor-count'
+    const LAST_VISIT_KEY = 'geocities-last-visit'
+    const ONE_DAY = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+
+    const now = Date.now()
+    const lastVisit = localStorage.getItem(LAST_VISIT_KEY)
+    const storedCount = localStorage.getItem(VISITOR_KEY)
+
+    let currentCount = storedCount ? parseInt(storedCount, 10) : 4200
+
+    // Only increment if it's been more than 1 day since last visit, or first visit
+    if (!lastVisit || now - parseInt(lastVisit, 10) > ONE_DAY) {
+      currentCount += 1
+      localStorage.setItem(VISITOR_KEY, currentCount.toString())
+      localStorage.setItem(LAST_VISIT_KEY, now.toString())
+    }
+
+    setVisitorCount(currentCount)
+
+    // Animate counter on load
+    let start = Math.max(0, currentCount - 50)
+    const duration = 2000
+    const startTime = Date.now()
+
+    const animateCounter = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const current = Math.floor(start + (currentCount - start) * progress)
+      setVisitorCount(current)
+
+      if (progress < 1) {
+        requestAnimationFrame(animateCounter)
+      }
+    }
+
+    animateCounter()
   }, [])
 
   return (
@@ -133,11 +172,9 @@ export default function HomePage() {
         <div className="visitor-counter">
           <div className="counter-label">Visitor Counter:</div>
           <div className="counter-digits">
-            <span className="digit">0</span>
-            <span className="digit">0</span>
-            <span className="digit">4</span>
-            <span className="digit">2</span>
-            <span className="digit">0</span>
+            {visitorCount.toString().padStart(5, '0').split('').map((digit, index) => (
+              <span key={index} className="digit">{digit}</span>
+            ))}
           </div>
         </div>
       </div>
