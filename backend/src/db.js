@@ -1,5 +1,8 @@
 import { MongoClient } from 'mongodb'
 
+console.log('DEBUG - process.env.MONGODB_URI:', process.env.MONGODB_URI)
+console.log('DEBUG - All env vars:', Object.keys(process.env).filter(k => k.includes('MONGO') || k.includes('DB')))
+
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 const DB_NAME = process.env.DB_NAME || 'geocities'
 
